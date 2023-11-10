@@ -1,0 +1,77 @@
+Instalar JAVA
+	Copiar la carpeta java en d
+	descomprimir
+	dejar accesible la carpeta principal
+
+	Nueva variable de entorno de sistems
+		JAVA_HOME = E:\Java\jdk-14.0.2
+		Cambiar PATH del sistema
+			Agragar E:\Java\jdk-14.0.2\bin
+
+Comprobar version Java.
+java -version
+	Si ya se tiene java instalado con otra version es posible que java -version devuelva cualquiera
+	Si es asi no importa ya que en el IDE, se le especifica con que version trabajar
+
+Instalar INTELI
+	La primera vez elegit clonar proyecto
+	despues cuando abre el proyecto quizas el windows de da error, decir que excluya el directorio del control (Error de Windows Defender)
+	en el ide, en file, project structure
+	en project SDK decirle que java usa
+	ademas en file -> project structure -> platform setting -> SDKs configurar name y jdm home path de java = 14 E:\Java\jdk-14.0.2
+	entonces en maven
+		MuniBackEnd
+			Lifecycle
+				clean y dar boton play
+				install y dar boton play
+
+
+Si da error de Maven-surefire.. pegar esto en pom.xml (raiz del proyecto) linea aprox. 71
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+				<configuration>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+
+			adrentro del apartado build plugins
+
+
+en src/main/resource
+copiar el application.properties.dist como application.properties
+
+Leer el archivo Puesta a Punto Server Produccion y buscar este texto
+"ARCHIVO DE PROPIEDADES DE LA CONEXION DE LA BASE DE DATOS PROPIO PARA CADA ENTORNO"
+leerlo para terminar de configurar bien el INTELIDEA
+
+
+Confirgurar Apartado DATABASE a la altura de mavens
+Agregar un datasource
+Name = Oracle
+Host = 190.226.43.186
+SID = oramp
+puerto = 1521
+user = mp_muni_rest
+pass = wsxpoi75
+Hacer test conection y bajara el driver
+
+
+Configurar Add Configuracion del IDE
+Add
+Name=Aplicacion MBE
+Main Class=ar.gov.posadas.mbe.Aplicacion
+
+copiar el archivo src/sistema.properties.txt.dist como docs/sistema.properties.txt
+Verificar la unidad <property name="LOGS" value="C:\\Logs" />, dice D poner C o D o E o lo que corresponda
+
+copiar el archivo docs/logback.xml.txt.dist como docs/logback.xml.txt
+Verificar la unidad del app.path, dice D poner C o D o E o lo que corresponda
+
+Play al proyecto
+
+Instalar POSTMAN
+	https://www.postman.com/downloads/
+	

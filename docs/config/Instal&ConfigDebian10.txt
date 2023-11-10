@@ -1,0 +1,111 @@
+INSTALACION Y CONFIGURACION DEBIAN10	
+====================================
+(en VirtualBOX [CTRL DER + C] muestra el menu del VBOx)
+
+1) INSTALAR DESDE UN ISO
+   a. Que tenga conexion a internet durante la instalacion
+   b. Seleccionar replica en red (SI)
+   c. Instalar base+mate+sshserver
+   d. Configurar pantalla y eso
+
+2) CONFIGURAR USUARIOS
+   a. Agregar usuario al sudo: como root  #visudo  y allí ==> agregar "user    ALL=(ALL:ALL) ALL" abajo del de root (con el nombre del usuario correcto obvio)
+   b. Permitir conexión desde ssh: Editar el archivo /etc/ssh/sshd_config para buscar y agregar la siguiente linea: "PermitRootLogin yes"
+   c. Reiniciar el SSH: # sudo systemctl restart ssh
+
+3) INGRESAR AL SYNAPTICS PARA INSTALAR LOS PAQUETES FALTANTES
+   a. tomcat9+tomcat9commons+tomcat9admin (va desde el cdrom)
+      - verificar si quedó iniciado: sudo systemctl status tomcat9
+      - permitir conectarse al manager y admin: #sudo nano /etc/tomcat9/tomcat-users.xml: agregar los roles manager-gui y admin-gui y darles a usuarios
+	  - reiniciar el tomcat: # sudo systemctl restart tomcat9
+	  - probar con el firefox: http://127.0.0.1/     
+
+4) INSTALAR JAVA: jdk14  
+   a. sacar el cdrom como fuente de APT: #nano /etc/apt/sources.list (ahí comentar el tema del CDROM)
+   b. Agregar net-tools: #sudo apt intall -y net-tools
+   c. Instalar wget y curl: 
+      - # sudo apt update
+      - # apt -y install wget curl
+   d. Conectarse a https://www.oracle.com/ar/java/technologies/javase/jdk14-archive-downloads.html y descargar el ultimo para Debian
+      - usuario Oracle: noc@gtisa.com.ar   password: 0daDgrm1
+   e. Instalar java: # sudo apt install ./jdk-14_linux-x64_bin.deb
+   f. Setear el JAVA_HOME:
+      - # sudo nano /etc/profile.d/jdk14.sh
+	  - colocar en el archivo:
+	     ....
+		 export JAVA_HOME=/usr/lib/jvm/jdk-14.0.2
+         export PATH=$PATH:$JAVA_HOME/bin
+		 ....
+	  - # cd /usr/lib/jvm
+	  - # sudo rm default-java
+      - # sudo chown -R root:root jdk-14.0.2	  
+	  - # sudo ln -s jdk-14.0.2 default-java 
+	  - # sudo reboot now
+   
+5) CONFIGURAR EL TOMCAT PARA EL SISTEMA
+   a. Copiar el archivo "munipos.jks" en /etc/tomcat9
+   b. Tema SSL, habilitar en el /var/lib/tomcat9/server.xml:
+      ...
+	  <Connector port="8443" 
+                 protocol="org.apache.coyote.http11.Http11NioProtocol"
+                 maxThreads="150" 
+                 SSLEnabled="true">
+          <SSLHostConfig>
+              <Certificate certificateKeystoreFile="conf/munipos.jks"
+					       certificateKeystorePassword="munipos"
+                           type="RSA" />
+          </SSLHostConfig>
+      </Connector>
+	  ...
+   
+   
+6) GENERAR EL WAR DESDE INTELLIj
+   a. Usar el POM de ProduccionWar
+   b. Cambiar el puerto del application.properties al 8080
+   c. Tocar la clase "Aplicacion"
+   
+   
+   
+NOTA: INSTALAR TOMCAT EN WINDOWS
+================================
+
+0) Instalar el JDK 14 para Windows
+
+1) Bajar el Tomcat9 para Windows (en un zip)
+
+2) Copiar el zip a algún directorio en el C:
+   
+3) Descomprimir
+
+4) Setear las variables JAVA_HOME y CATALINA_HOME
+   Ejemplos: 
+     JAVA_HOME = C:\Java\jdk-14.0.2
+	 CATALINA_HOME = C:\Java\Tomcat9\apache-tomcat-9.0.41 
+	 
+5) Iniciar el Tomcat en Windows (no como servicio):
+   a. >> cd C:\Java\Tomcat9\apache-tomcat-9.0.41\bin
+   b. Ejecutar el C:\Java\Tomcat9\apache-tomcat-9.0.41\tomcat9w.exe
+   c. Agregar en la solapa de "Java" en el cuadro "Java Options":
+         -Dcom.sun.management.jmxremote.port=1099 
+		 -Dcom.sun.management.jmxremote.rmi.port=1099 
+		 -Dcom.sun.management.jmxremote.ssl=false 
+		 -Dcom.sun.management.jmxremote.authenticate=false
+   d. Iniciar el Tomcat con doble-click en C:\Java\Tomcat9\apache-tomcat-9.0.41\bin\tomcat9.exe
+   e. Configurar el Tomcat Remoto desde el Intellij u otro
+   f. Darle Play
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   

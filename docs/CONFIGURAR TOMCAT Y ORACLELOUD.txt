@@ -1,0 +1,52 @@
+INSTALALCION Y CONFIGURACION DEL TOMCAT CON ORACLECLOUD
+=======================================================
+
+1) DESCAGA DEL TOMCAT
+
+2) DESCOMPRIMIR A UN DIRECTORIO EN EL C: (SIN ESPACIOS)
+
+3) ASEGURARSE DE TENER LAS SIGUIENTES VARIABLES DE ENTORNO:
+
+- CATALINA_HOME -> al home del apache tomcat
+- JAVA_HOME -> al home del jdk
+- SPRING_CONFIG_LOCATION -> classpath:/application.properties,file:C:\\Datos\\desarrollo\\mbe\\local\\appext.properties
+- ORACLE_HOME -> al home del instant client
+- PATH -> agregar el bin de java, el bin del apache y el bin del instant client
+
+4) COPIAR EL ARCHIVO DE FIRMAS:
+
+fitomcat.p12 -> CATALINA_HOME/conf
+
+5) ACOMODAR EL server.xml:
+
+    <Connector connectionTimeout="20000" 
+				port="8080" 
+				protocol="HTTP/1.1" 
+				redirectPort="8443"/>
+			   
+	<Connector SSLEnabled="true" 
+				maxThreads="150" 
+				port="8443" 
+				protocol="org.apache.coyote.http11.Http11NioProtocol">
+	           <SSLHostConfig>
+		          <Certificate certificateKeystoreFile="conf/fitomcat.p12" 
+								certificateKeystorePassword="fitomcatksp" 
+								type="RSA"/>
+	           </SSLHostConfig>
+    </Connector>
+	
+6) COPIAR LAS LIBRERIAS DE ORACLE AL lib DEL APACHE:
+
+- oraclepki.jar -> CATALINA_HOME/bin
+- osdt_cert.jar -> CATALINA_HOME/bin
+- osdt_core.jar -> CATALINA_HOME/bin
+
+7) SETEAMOS LOS USUARIOS PARA TOMCAT EN EL tomcat_users.xml:
+
+	<tomcat-users>
+	  <role rolename="manager"/>
+	  <role rolename="admin"/>
+	  <user username="admin" password="qwerty" roles="admin,manager"/>
+	</tomcat-users>	
+	
+8) 

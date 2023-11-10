@@ -1,0 +1,72 @@
+TIPs:
+====
+
+1) Si se tiene un master-detail y se quiere meter todos junto desde un JSON a un REST
+   (en el siguiente ejemplo se ve que los ids "padre-id" e "hijo-id" son generados
+   automaticamente por el JPA):
+
+{
+  "padre-campo1": "xxx"
+  "padre-campo2": "xxx"
+  "padre-campo3": 123
+  "hijos":
+  [
+    {"hijo-campo1": "xxx", "hijo-campo2": 123}
+    {"hijo-campo1": "aaa", "hijo-campo2": 234}
+  ]
+}
+
+en este caso los hijos no van a tener al padre asignado y el insert va a fallar por eso.
+Lo que hay que hacer es lo siguiente:
+
+public class Hijo {
+   ...
+   @JsonIgnore    // <<<<<<<< ESTO DEBO AGREGARLO PARA QUE SE OMITA EN JSON !!!!
+   @NotNull(message = Constantes.MSJ_ERR_DB_FIELD_EMPTY)
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+   @JoinColumn(name = "padre")
+   private Padre padre;
+   ...
+}
+
+y despues tengo que en el onPersist() de la entidad Padre, setear el padre a cada hijo:
+
+@Entity
+@Table(name = "padre")
+public class Padre extends Entidad {
+...
+   public void onPersist() {
+       hijos.forEach(h -> h.setPadre(this));
+   }
+...
+}
+
+--------------------------------------------------------------------------------------------
+
+2) Cuando se necesita una clase que no coincide con una entidad, sino que es una mezcla de
+varias cosas, se usa una clase DTO: "una clase de apoyo para representar informacion mezclada".
+
+Las clases DTO sirven mucho para representar información de base para reportes (que juntan
+datos de muchas entidades mezcladas).
+
+---------------------------------------------------------------------------------------------
+
+3) Vean esto:
+
+	@Transactional <<<<< ESTA MARCA ES PORQUE NO ES UN SELECT (ASI SUELTO ES OBLIGATORIO), PERO
+	                     SI ESTO SE EJECUTA DESDE
+	                     UN METODO QUE ADEMAS HACE OTRAS COSAS (E INCLUSO LLAMA A UN persist())
+	                     LO IDEAL ES HACERLO DESDE EL METODO MISMO, ES DECIR MARCAR EL METODO,
+	                     DE ESA FORMA, SI ALGO DEL METODO FALLA, EL ROLLBACK ES SOBRE TODAS LAS
+	                     SENTENCIAS INVOLUCRADAS
+	@Modifying
+	@Query(value = "INSERT INTO consulta_examen(id_consulta, id_examen) VALUES (:idConsulta, :idExamen)", nativeQuery = true)
+	Integer registrar(@Param("idConsulta") Integer idConsulta, @Param("idExamen") Integer idExamen);
+
+Entonces: hay que usar el @Transaccional en los metodos cuyas sentencias (y los cambios a la
+          base de datos que estas generan) se quieran agrupar dentro de una misma transaccion
+          para que se confirmen todas juntas o ninguna. Tambien se puede colocar a nivel de
+          clase, en cuyo caso todos los metodos de la misma seran tomados como transaccionales.
+
+          NOTA: ESTO HIZO MODIFICAR EL PERSIST DE saveAndFlush() a save()!!!!!!!!!!!!!!!!!!!!
+---------------------------------------------------------------------------------------------

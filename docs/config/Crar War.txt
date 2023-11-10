@@ -1,0 +1,39 @@
+Maven
+	Lifecycle
+		Package (Click Derecho)
+			Run Maven Build
+			
+Se genera el war en la carpeta target -> con el nombre mbe-0.0.1-SNAPHOT.war
+
+Este archivo hay que copiarlo al servidor Tomcat
+
+el server tomcat esta en un server interno, por lo que uso el 190.226.43.189:4422 para entrar 
+
+uso winscp con usuario jfragueiro / erifito1
+
+copio el war obtenido de la compilacion a la carpeta home/jfragueiro
+
+renombro ese war como sig.war
+
+salgo de winscp
+
+entro con putty, mismo server, mismo usuario
+
+hago sudo su (me pide las credenciales de jfragueiro) ahora estoy como root
+
+cd /opt/tomcat/webapps
+
+copio aca el war que esta en la carpeta del usuario
+
+rm -r sig -- borro el proyecto actual para asegurarme de que se haga el deplyoy
+rm sig.war
+cp /home/jfragueiro/sig.war .
+
+me muevo a la carpeta /opt/tomcat/webapps/sig/WEB-INF/classes
+hago nano logback.xml
+cambio el path del log, bien arriba por /opt/tomcat/logs
+
+o bien sacar la definicion de la linea del path y ademas hacer que no exista el archivo 
+renombrandolo por ejemplo como logback.xml.old
+
+systemctl restart tomcat

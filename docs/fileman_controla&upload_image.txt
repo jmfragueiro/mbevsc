@@ -1,0 +1,15 @@
+
+/**
+ *  METODOLOGIA ORIGINAL
+ *  NO BORRE PARA TENER COMO EJEMPLO LA OBTENCION DE UNA IMAGEN Y SU POSTERIOR GRABACION
+ *  USANDO LOS METODOS DEL SERVICE DE FILEMANAGER
+ */
+/* Obtengo la Imagen Actual de la Persona en formato byte */
+byte[] imagenExistente = fileManagerService.obtenerArchivoDelRepositorio("persona@foto", personaoriginal.getImagen());
+/* Borro del Repositorio la Imagen Actual Existente */
+ResponseEntity<fileResponseDTO> imagenBorrada = fileManagerService.borrarArchivoDelRepositorio("persona", "foto", false, "<vacio>", personaoriginal.getImagen(), personaoriginal.getId().toString());
+/* Transformo la Imagen obtenida como byte a MultipartFile, ya que asi lo requiere el service del fileManager para hacer upload */
+InputStream inputStream = new ByteArrayInputStream(imagenExistente);
+MultipartFile imagenASubir = new MockMultipartFile(persona.getImagen(), personaoriginal.getImagen(), null, inputStream);
+/* Subo al Repositorio la Misma Imagen pero cambiando su nombre */
+ResponseEntity<fileResponseDTO> imagenSubida = fileManagerService.subirArchivoAlRepositorio(imagenASubir, "persona", "foto", persona.getDocumento().toString(), false, "<vacio>", persona.getId());

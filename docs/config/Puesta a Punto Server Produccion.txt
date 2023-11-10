@@ -1,0 +1,261 @@
+Instalacion Linux Debian 10
+Sin Entorno Grafico de Escritorio
+Con Apache
+Con SSH Server
+
+Clave root - wsxpoi75
+Instalacion de Usuario Propio
+
+como el mouse no me anda porque no instale el entorno de escritorio hago esto
+apt update
+
+apt_get intall gpm
+
+apt_get intall sudo
+
+apt intall -y net-tools
+
+apt-get install mc
+
+apt-get install ssh
+
+apt -y install wget curl
+
+apt-get -y upgrade - Actualiza el Linux
+
+crear todos los usuarios necesarios
+    para hacer que estos usuario tengan privilegios de root
+    editar el archivo /etc/sudoers
+    agragar a los usuarios requeridos con los permisos de root
+    ejemplo
+    root        ALL=(ALL:ALL) ALL
+    lschwegler  ALL=(ALL:ALL) ALL
+    ajmartinez  ALL=(ALL:ALL) ALL
+
+Editar el archivo /etc/ssh/sshd_config para buscar y agregar la siguiente linea: "PermitRootLogin yes"
+INSTALAR TOMCAT
+    apt-get install tomcat9
+    apt-get install tomcat9-commontomcat9admin
+    apt-get install tomcat9-admin
+    apt-get install libfontconfig1
+    ver ... hay muchos sugeridos entre ellos font
+
+	La configuracion del tomcat9 esta en /etc/tomcat9
+	La carpeta raiz del tomcat donde estan las app esta en /var/lib/tomcat9
+
+INSTALAR JAVA: jdk14
+   a. sacar el cdrom como fuente de APT: #nano /etc/apt/sources.list (ahí comentar el tema del CDROM)
+   b. Agregar net-tools: #sudo apt intall -y net-tools
+   c. Instalar wget y curl:
+      - # sudo apt update
+      - # apt -y install wget curl
+   d. Conectarse a https://www.oracle.com/ar/java/technologies/javase/jdk14-archive-downloads.html y descargar el ultimo para Debian
+      me conecto desde una pc, bajo el archivo y despues lo pase con winscp ya que no instale la parte grafica en el server
+      - usuario Oracle: noc@gtisa.com.ar        password: 0daDgrm1
+      - usuario Oracle: luis_schw@hotmail.com   password: Damasco04
+   e. Instalar java: # sudo apt install ./jdk-14_linux-x64_bin.deb
+   f. Setear el JAVA_HOME:
+      - # sudo nano /etc/profile.d/jdk14.sh
+	  - colocar en el archivo:
+	     ....
+		 export JAVA_HOME=/usr/lib/jvm/jdk-14
+         export PATH=$PATH:$JAVA_HOME/bin
+		 ....
+	  - # cd /usr/lib/jvm
+	  - # sudo rm default-java
+      - # sudo chown -R root:root jdk-14.0.2
+	  - # sudo ln -s jdk-14.0.2 default-java
+	  - # sudo reboot now
+
+CONFIGURAR EL TOMCAT PARA EL SISTEMA
+   a. Copiar el archivo "munipos.jks" en /etc/tomcat9
+   b. Tema SSL, habilitar en el /var/lib/tomcat9/server.xml:
+      ...
+	  <Connector port="8443"
+                 protocol="org.apache.coyote.http11.Http11NioProtocol"
+                 maxThreads="150"
+                 SSLEnabled="true">
+          <SSLHostConfig>
+              <Certificate certificateKeystoreFile="conf/munipos.jks"
+					       certificateKeystorePassword="munipos"
+                           type="RSA" />
+          </SSLHostConfig>
+      </Connector>
+	  ...
+
+Instalar Cliente ORACLE
+    Si es necesario, el proyecto en java que se ejecuta aca ya tiene oracle instalado
+	Si hubiera que instalar php seria necesario el cliente oracle
+
+	1. Obtener los zip del Instantclient
+                   Esto se baja de la pagina de oracle
+                   http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
+                        instantclient-basic-linux.x64-12.2.zip
+                        instantclient-sdk-linux.x64-12.2.zip
+                        instantclient-sqlplus-linux.x64-12.2.zip
+
+    2. Unzip the packages into a single directory such as /opt/oracle/instantclient_12_2 that is accessible to your application. For example:
+
+                cd /opt/oracle
+                    unzip instantclient-basic-linux.x64-12.2.0.1.0.zip
+                    unzip instantclient-sdk-linux.x64-12.2.0.1.0.zip
+
+	3. Prior to version 12.2, create the appropriate links for the version of Instant Client. For example:
+
+                cd /opt/oracle/instantclient_12_2
+                    ln -s libclntsh.so.12.1 libclntsh.so
+                    ln -s libocci.so.12.1 libocci.so
+
+    4. Install the libaio package. This is called libaio1 on some Linux distributions.
+
+               apt-get install libaio1
+
+               si falta rlwrap lo instalamos mediante apt
+               apt-get install rlwrap
+
+
+
+----------------------------------------------------------------------------------
+ARCHIVO DE PROPIEDADES DE LA CONEXION DE LA BASE DE DATOS PROPIO PARA CADA ENTORNO
+----------------------------------------------------------------------------------
+Configurar TOMCAT para que busque los datos de conexion y propiedades extras desde un archivo "externo" al webapps
+    1. Buscar un archivo "setenv.sh" en CATALINA_HOME/bin o CATALINA_BASE/bin ("setenv.bat" en Windows)
+
+    2. Si no existe el archivo crearlo y dejarlo con las siguientes propiedades (como los demas .sh del /bin):
+            -rwxr-x--- 1 root tomcat    159 Sep 13 19:21 setenv.sh
+		
+		Luis 03 11 2021
+		En el Server de Produccion 10.0.20.35 este archivo lo cree, y esta en /usr/share/tomcat9/bin
+
+
+    3. Agregar dentro del archivo (al final) lo siguiente:
+            export SPRING_CONFIG_LOCATION=classpath:/application.properties,file:/opt/tomcat/conf/springext.properties
+			
+			Luis 03 11 2021
+			En el server de produccion
+		    export SPRING_CONFIG_LOCATION=classpath:/application.properties,file:C:/Datos/desarrollo/mbe/local/appext.properties
+       
+	   (allí se setean dos archios de properties: uno en el classpath -en webapps- y otro externo)
+
+    4. Crear el archivo de propiedades "externas" (aquí llamado springext.properties -puede ser cualqueir nombre-)
+            #> nano /opt/tomcat/conf/springext.properties
+
+    5. Colocar en dicho archivo las variables externas (por ejemplo los datos de conexion):
+            ###########################################################################
+            # ARCHIVO DE VARIABLES EXERNAS PARA SPRING                                #
+            # FITO (13/09/2021)                                                       #
+            ###########################################################################
+
+            server.port=8080
+
+            ###############################################################################
+            ## VALORES DE HTTPS (SSL)                                                    ##
+            ###############################################################################
+            server.ssl.key-store=classpath:munipos.jks
+            server.ssl.key-store-type=pkcs12
+            server.ssl.key-store-password=munipos
+            server.ssl.key-password=munipos
+            server.ssl.key-alias=munipos
+
+            # Conexion Esquema de Produccion
+            #server.entorno=PRODUCCION
+            #spring.datasource.url=jdbc:oracle:thin:@10.0.20.4:1521/oramp
+            #spring.datasource.username=
+            #spring.datasource.password=
+
+            # Conexion Esquema Muni - Capacitacion Pruebas
+            server.entorno=DESARROLLO
+            spring.datasource.url=jdbc:oracle:thin:@190.226.43.186:1521/oramp
+            spring.datasource.username=mp_muni_rest
+            spring.datasource.password=wsxpoi75
+
+
+
+       (hay un ejemplo aquí en "conf_extra" llamado springext.properties.dist)
+
+    6. Reiniciar el TOMCAT
+
+    NOTA: para que funcione en el IntelliJ Idea, hay que configurar una variable de entorno en la configuracion
+          de Run/Debug (arriba en el combo donde esta el nombre antes del "play", allí ingresar a Edit Configuration...
+          y luego colocar en el campo environment variables -ejemplo-:
+            SPRING_CONFIG_LOCATION=classpath:/application.properties,file:D:\Sistemas\munibackend\docs\springext.properties
+          )
+
+    NOTA 2: para la parte de test está seteado en un par de anotaciones de clase:
+        @PropertySource("classpath:/application.properties")
+        @PropertySource("file:D:\\Sistemas\\munibackend\\conf_extra\\springext.properties")
+
+
+
+
+
+
+
+
+
+
+
+
+Instalar Cliente ORACLE
+
+https://miracomosehace.com/instalar-escritorio-remoto-anydesk-linux-ubuntu-consola/
+
+parado en mi home
+wget https://download.anydesk.com/linux/deb/anydesk_6.0.0-1_amd64.deb
+
+export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
+apt install –f (Para Solucionar error falla de dependencias)
+dpkg anydesk_6.0.0-1_amd64.deb
+
+Linux
+
+Installation
+
+AnyDesk for Linux can be downloaded and updated via the command-line interface using the AnyDesk repositiories. Instructions on how to set up and use the repositories can be found below: http://deb.anydesk.com/howto.html http://rpm.anydesk.com/howto.html
+
+Initialization Parameters
+
+Parameter	Description
+--service	Start the AnyDesk service, if not already running.
+--stop-service	Stop the AnyDesk service.
+--restart-service	Restart the AnyDesk service.
+--silent	AnyDesk will not display message boxes when this parameter is specified. Recommended for scripts.
+--remove	Silently uninstall AnyDesk with no notice.
+Get Alias, ID, Status or Version
+
+Get AnyDesk-ID:
+
+anydesk --get-id
+Get AnyDesk-Alias:
+
+anydesk --get-alias
+Get online status of AnyDesk client:
+
+anydesk --get-status
+Get AnyDesk version:
+
+anydesk --version
+Setting an Unattended Access Password
+
+For security reasons, a password for unattended access can not be set from the command line directly as this would enable malicious users to spy the password from the command line in Task Manager. Instead, a pipe is used to set the password.
+
+echo password | sudo anydesk --set-password
+
+Note: This requires administrator privileges.
+Registering the License Key
+
+You can register a license with the current AnyDesk installation using the command line. The service must be running.
+
+echo license_keyABC | anydesk --register-license
+
+Almost every scripting language has a pipe interface for stdin and stdout. See the programming language documentation for more information.
+
+Connecting to an AnyDesk Client
+
+To connect to a remote AnyDesk ID or Alias, the syntax is: anydesk alias@ad
+
+The following commands can be added after the destination address:
+
+--file-transfer	﻿Start the file transfer session.
+--fullscreen	Start a session with fullscreen mode.
+--plain	Start a plain session, without window title and toolbar.

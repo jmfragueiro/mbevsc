@@ -1,0 +1,13 @@
+cd /var/www/html/mp_website/public/images/repositorio
+
+find ./ -type f -name "*.*" -print >copiar.list
+
+cat copiar.list | xargs -I {} cp -uf {} /var/www/html/mp_website/public/images/repositorio_desarrollo/
+
+
+
+
+
+
+
+find ./ -type f -iname *.* -exec cp {} -t -r -v /var/www/html/mp_website/public/images/repositorio_desarrollo/ ;

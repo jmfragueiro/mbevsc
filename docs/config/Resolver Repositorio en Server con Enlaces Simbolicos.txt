@@ -1,0 +1,101 @@
+-----------------------------------------------------------------------
+Resolver Repositorio en Server con Enlaces Simbolicos
+-----------------------------------------------------------------------
+
+Estoy Trabajando con Carpetas del Server WEB de la Municipalidad de Posadas 190.226.43.188
+------------------------------------------------------------------------------------------
+
+Creo las Carpetas para el Repositorio Completo en
+/var/www/repositorio
+/var/www/repositorio_desarrollo
+
+Paso el contenido completo que ahora esta en mp_website a estas nuevas Carpetas
+
+    Me posiciono en la nueva carpeta del repositorio de desarrollo
+        cd/var/www/repositorio
+        cp -r /var/www/html/mp_website/public/images/repositorio/* .
+        cambio permisos chmod 755 -R /var/www/repositorio
+
+    Me posiciono en la nueva carpeta del repositorio de desarrollo
+        cd/var/www/repositorio_desarrollo
+        cp -r /var/www/html/mp_website/public/images/repositorio_desarrollo/* .
+        cambio permisos chmod 755 -R /var/www/repositorio_desarrollo
+
+
+Creo link de acceso a las carpetas nuevas, solo para los casos que se acceden via URL
+-------------------------------------------------------------------------------------
+sintaxis ls -s <nombre de la carpeta real> <nombre del enlace simbolico>
+
+Estos enlaces los voya crear en la carpeta de imagenes del Sitio Web que se usa para acceder a las misas,
+desde ahi este link deriva la peticion a la carpeta real.
+
+Entonces, estos link creados se ven con un DIR o LS dentro de la carpeta /var/www/html/mp_website/public/images/
+Opte por los ejemplos de mas abajo y funciono correctamente
+
+Vale entonces aclarar que se accede con la siguiente Url
+www.posadas.gob.ar/images/<nombre del link simbolico>/<nombre de la imagen>
+www.posadas.gob.ar/images/repositorio_per_foto/<nombre de la imagen>
+
+
+PARA PERSONAS
+    ln -s /var/www/repositorio/persona/foto /var/www/html/mp_website/public/images/repositorio_per_foto
+    ln -s /var/www/repositorio_desarrollo/persona/foto /var/www/html/mp_website/public/images/repositorio_desarrollo_per_foto
+
+PARA EVENTOS
+    ln -s /var/www/repositorio/evento/foto /var/www/html/mp_website/public/images/repositorio_eve_fot
+    ln -s /var/www/repositorio_desarrollo/evento/foto /var/www/html/mp_website/public/images/repositorio_desarrollo_eve_foto
+
+PARA PATRIMONIO
+    ln -s /var/www/repositorio/patrimonio/foto /var/www/html/mp_website/public/images/repositorio_pat_fot
+    ln -s /var/www/repositorio_desarrollo/patrimonio/foto /var/www/html/mp_website/public/images/repositorio_desarrollo_pat_foto
+
+PARA USUARIOS
+    ln -s /var/www/repositorio/usuario/foto /var/www/html/mp_website/public/images/repositorio_usu_fot
+    ln -s /var/www/repositorio_desarrollo/usuario/foto /var/www/html/mp_website/public/images/repositorio_desarrollo_usu_foto
+
+PARA CEMENTERIO
+    ln -s /var/www/repositorio/cementerio /var/www/html/mp_website/public/images/repositorio_cem_fot
+    ln -s /var/www/repositorio_desarrollo/cementerio /var/www/html/mp_website/public/images/repositorio_desarrollo_cem_foto
+
+Borrar enlace simbolico
+    rm /var/www/html/mp_website/public/images/repositorio_per_foto
+    o
+    unlink /var/www/html/mp_website/public/images/repositorio_per_foto
+
+Esto esta preparado para ejecutar desde el server web (190.226.43.188)
+rsync -vartc --delete --progress /var/www/repositorio/* root@190.226.43.189:/var/www/repositorio_backup
+    si agrego la opcion --dry-run o -n
+    nos permite ejecutar una operación de prueba sin realizar ningún cambio, nos muestra qué archivos se van a copiar.
+
+rsync -vartc --delete --progress /var/www/repositorio/agente/recibo/* root@190.226.43.189:/var/www/mp_sistemas/recibosueldo
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+Voy a crear claves publicas de acceso director para ysar rsync con un cron automatico
+-----------------------------------------------------------------------------------------------------------------------
+
+1) en el servidor de Origen (En este caso mi webserver donde esta el origen del repositorio que estoy copiando
+    a otro servidor (Mi Server Origen 190.226.43.188)
+
+2) Ejecuto ssh-keygen -t rsa (Estoy posicioando en la home de root /root) ya que con ese usuario voy a hacer la copia
+
+3) Me propone que mi clave publica se va a generar en un archivo llamado id_rsa
+    Crea dos archivos id_rsa e id_rsa.pub que al final es el archivo a utilizar posteriormente
+
+4) CREAR EL DIRECTORIO .SSH EN DESTINO PARA LA SINCRONIZACIÓN SIN CONTRASEÑA
+    Una vez cumplido este requisito previo tenemos que crear el directorio ~/.ssh, en el servidor, o equipo de destino.
+    Esto es tan sencillo como ejecutar el siguiente comando en un terminal de tu equipo,
+    ssh root@190.226.43.189 mkdir -p .ssh (En este caso ya estaba creado)
+
+5) Una vez que tengo mi clave publica (id_rsa.pub) debo copiarla al servidor donde quiero loguearme sin clave
+    En este caso lo hago al server donde va a estar el backup del repositorio (190.226.43.189), que fue nombrado en
+    el paso anterior (4)
+
+6) ssh-copy-id -i ~/.ssh/id_rsa.pub root@190.226.43.189
+
+7) Probar. desde el cliente (190.226.43.188) hacer un ssh root@190.226.43.189 y no deberia pedirme clave de acceso
+
+8) En el serverWeb agregue cron a las 23 horas de todos los dias para que ejecute el rsync del repositorio
+    y a las 22 rsync de los recibos de sueldos en la carpeta mp_sistemas, esto debe estar unicamente hasta que
+    cambie autogestion, en cuanto a la ubicacion de los recibos en la consulta del usuario

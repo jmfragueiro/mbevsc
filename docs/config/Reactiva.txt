@@ -1,0 +1,40 @@
+// dos ejemplos de programación reactiva en donde unimos
+// varios observables en un "forkJoin" para que el proceso
+// solo siga dependiendo del final de estos
+// con arrays:
+
+    let array = [];
+    for (let i = 0; i < 3; i++) {
+      let obs = this.especialidadService.listar();
+      array.push(obs);
+    }
+
+    forkJoin(array).subscribe(data => {
+      console.log(data);
+    });
+
+// con varargs:
+
+    let obs1 = this.especialidadService.listar();
+    let obs2 = this.especialidadService.listar();
+    let obs3 = this.especialidadService.listar();
+
+    forkJoin(obs1, obs2, obs3).subscribe(data => {
+      console.log(data);
+    });
+
+// se puede revisar "learnRXJS" una pagina de programacion reactiva
+
+
+-------------------------------------------------------------------------------------------------
+
+///////////////////////////////////////////////////////////////
+// ESTO ES SOLO PARA CUANDO HAY PROCESAMIENTO INTERMEDIO!!! ///
+// (SINO SIRVE PERFECTAMENTE LO DE ABAJO)                   ///
+///////////////////////////////////////////////////////////////
+this.servicio.modificar(this.objeto)
+           .pipe(switchMap(() => { return this.servicio.listar() }))  // ESTE SERIA EL PROCESAMIENTO INTERMEDIO...
+           .subscribe(data => {                                       // (QUE DEBE RETORNAR TAMBIEN UN OBSERVABLE)
+             this.servicio.sujeto.next(data);
+             this.mostrarMensaje('EL ITEM SE HA ACTUALIZADO CORRECTAMENTE');
+           });
