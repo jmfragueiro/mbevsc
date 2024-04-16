@@ -5,7 +5,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 public class ServletInitializer extends SpringBootServletInitializer {
     @Override
-    // inicializacion de sprinboot
+    // inicializacion de sprinboot 3.x
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(MBEApplication.class);
     }
