@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MBEApplication {
     // punto de entrada a la app
     public static void main(String[] args) {
+        // esto se puone que hace algo
         SpringApplication.run(MBEApplication.class, args);
     }
 }
