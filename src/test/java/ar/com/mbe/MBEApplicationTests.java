@@ -2,8 +2,9 @@ package ar.com.mbe;
 
 import ar.com.mbe.core.common.H;
 import ar.com.mbe.core.common.L;
+import ar.com.mbe.sistema.params.Parametro;
 import ar.com.mbe.sistema.seguridad.permiso.IPermisoService;
-import ar.com.mbe.aperos.params.Parametro;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

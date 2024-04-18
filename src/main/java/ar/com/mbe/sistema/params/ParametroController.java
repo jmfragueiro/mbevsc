@@ -1,4 +1,4 @@
-package ar.com.mbe.aperos.params;
+package ar.com.mbe.sistema.params;
 
 import ar.com.mbe.base.control.Controlador;
 import org.springframework.beans.factory.annotation.Autowired;

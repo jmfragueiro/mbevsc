@@ -1,4 +1,4 @@
-package ar.com.mbe.aperos.params;
+package ar.com.mbe.sistema.params;
 
 import ar.com.mbe.base.entity.Entidad;
 import ar.com.mbe.core.common.C;
