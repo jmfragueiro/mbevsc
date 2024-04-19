@@ -34,7 +34,7 @@
     </repositories>
 
     <dependencies>
-        <!-- MODULOS DE SPRING BOOT. -->
+        <!-- MODULOS DE SPRING BOOT -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
