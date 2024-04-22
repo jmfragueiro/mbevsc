@@ -34,7 +34,7 @@
     </repositories>
 
     <dependencies>
-        <!-- MODULOS DE SPRING BOOT.. -->
+        <!-- MODULOS DE SPRING BOOT (esto se integrará solo en github -en el remoto- para generar conflicto 2) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
