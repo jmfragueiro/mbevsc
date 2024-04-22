@@ -34,7 +34,7 @@
     </repositories>
 
     <dependencies>
-        <!-- MODULOS DE SPRING BOOT (para commit) -->
+        <!-- MODULOS DE SPRING BOOT (despues del commit) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
