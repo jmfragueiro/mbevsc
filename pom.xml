@@ -34,7 +34,6 @@
     </repositories>
 
     <dependencies>
-        <!-- MODULOS DE SPRING BOOT (esto NO se integrará solo en github pero ahora esto genera quilombo) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -64,8 +63,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- UTILERÍAS DE TERCEROS -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc10</artifactId>
